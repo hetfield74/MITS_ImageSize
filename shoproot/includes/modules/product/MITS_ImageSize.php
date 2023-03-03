@@ -20,7 +20,7 @@ class MITS_ImageSize {
   function __construct() {
     $this->code = 'MITS_ImageSize';
     $this->name = 'MODULE_PRODUCT_' . strtoupper($this->code);
-    $this->version = '1.0';
+    $this->version = '1.1';
     $this->title = defined($this->name.'_TITLE') ? constant($this->name.'_TITLE') . ' - v' . $this->version : $this->code . ' - v' . $this->version;
     $this->description = defined($this->name.'_DESCRIPTION') ? constant($this->name.'_DESCRIPTION') : '';
     $this->sort_order = defined($this->name . '_SORT_ORDER') ? constant($this->name . '_SORT_ORDER') : 0;
