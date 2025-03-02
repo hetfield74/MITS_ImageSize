@@ -7,11 +7,11 @@
 
 <hr />
 
-Diese Klassenerweiterungen liest die Bildabmessungen der Artikelbilder aus und stellt sie in den Smarty-Variablen {$PRODUCTS_IMAGE_SIZE}, {$module_data.PRODUCTS_IMAGE_SIZE}, {$module_data.PRODUCTS_IMAGE_SIZE_MIDI} usw. zur Verfügung.
+Diese Klassenerweiterungen liest die Bildabmessungen der Artikelbilder aus und stellt sie in den Smarty-Variablen `{$PRODUCTS_IMAGE_SIZE}`, `{$module_data.PRODUCTS_IMAGE_SIZE}`, `{$module_data.PRODUCTS_IMAGE_SIZE_MIDI}` usw. zur Verfügung.
 
-Außerdem sind die Größen für die Kategorie-Hauptbilder {$CATEGORIES_IMAGE_SIZE} für {$CATEGORIES_IMAGE} in categorie_listing.html und product_listing_v1.html vorhanden.
+Außerdem sind die Größen für die Kategorie-Hauptbilder `{$CATEGORIES_IMAGE_SIZE}` für `{$CATEGORIES_IMAGE}` in categorie_listing.html und product_listing_v1.html vorhanden.
 
-Die Abmessungen der Hersteller-Logos sind auf der Artikeldatailseite per {$MANUFACTURER_IMAGE_SIZE} erweiterbar.
+Die Abmessungen der Hersteller-Logos sind auf der Artikeldatailseite per `{$MANUFACTURER_IMAGE_SIZE}` erweiterbar.
 
 <hr />
 
