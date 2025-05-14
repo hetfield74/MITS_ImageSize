@@ -31,18 +31,15 @@ class MITS_ImageSize
     {
         $this->code = 'MITS_ImageSize';
         $this->name = 'MODULE_PRODUCT_' . strtoupper($this->code);
-        $this->version = '1.2';
+        $this->version = '1.3';
         $this->title = defined($this->name . '_TITLE') ? constant($this->name . '_TITLE') . ' - v' . $this->version : $this->code . ' - v' . $this->version;
         $this->description = defined($this->name . '_DESCRIPTION') ? constant($this->name . '_DESCRIPTION') : '';
         $this->sort_order = defined($this->name . '_SORT_ORDER') ? constant($this->name . '_SORT_ORDER') : 0;
-        $this->enabled = defined($this->name . '_STATUS') && constant($this->name . '_STATUS') == 'true' ? true : false;
+        $this->enabled = defined($this->name . '_STATUS') && (constant($this->name . '_STATUS') == 'true');
 
-        $version_query = xtc_db_query("SELECT configuration_value FROM " . TABLE_CONFIGURATION . " WHERE configuration_key = '" . $this->name . "_VERSION'");
-        if (xtc_db_num_rows($version_query)) {
-            if ($this->version != constant($this->name . '_VERSION')) {
-                xtc_db_query("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . $this->version . "' WHERE configuration_key = '" . $this->name . "_VERSION'");
-            }
-        } elseif (defined($this->name . '_STATUS')) {
+        if (defined($this->name . '_VERSION') && $this->version != constant($this->name . '_VERSION')) {
+            xtc_db_query("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . $this->version . "' WHERE configuration_key = '" . $this->name . "_VERSION'");
+        } elseif (defined($this->name . '_STATUS') && !defined($this->name . '_VERSION')) {
             xtc_db_query(
               "INSERT INTO " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('" . $this->name . "_VERSION', '" . $this->version . "', 6, 99, NULL, now())"
             );
@@ -52,8 +49,12 @@ class MITS_ImageSize
     function check()
     {
         if (!isset($this->_check)) {
-            $check_query = xtc_db_query("SELECT configuration_value FROM " . TABLE_CONFIGURATION . " WHERE configuration_key = '" . $this->name . "_STATUS'");
-            $this->_check = xtc_db_num_rows($check_query);
+            if (defined($this->name . '_STATUS')) {
+                $this->_check = true;
+            } else {
+                $check_query = xtc_db_query("SELECT configuration_value FROM " . TABLE_CONFIGURATION . " WHERE configuration_key = '" . $this->name . "_STATUS'");
+                $this->_check = xtc_db_num_rows($check_query);
+            }
         }
         return $this->_check;
     }
