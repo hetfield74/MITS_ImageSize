@@ -12,8 +12,11 @@
  * --------------------------------------------------------------
  */
 
-if ((defined('MODULE_PRODUCT_MITS_IMAGESIZE_STATUS') && MODULE_PRODUCT_MITS_IMAGESIZE_STATUS == 'true')) {
-    $image_attr = $image_attr_list = $image_attr_mobile = '';
+if ((defined('MODULE_PRODUCT_MITS_IMAGESIZE_STATUS')
+  && MODULE_PRODUCT_MITS_IMAGESIZE_STATUS == 'true')
+  && isset($rows)
+) {
+  $image_attr = $image_attr_list = $image_attr_mobile = '';
 
     if (isset($image) && $image != '' && is_file(DIR_FS_CATALOG . $image)) {
         list($image_width, $image_height, $image_type, $image_attr) = getimagesize(DIR_FS_CATALOG . $image);
@@ -28,7 +31,7 @@ if ((defined('MODULE_PRODUCT_MITS_IMAGESIZE_STATUS') && MODULE_PRODUCT_MITS_IMAG
         $image_attr_mobile = ' ' . $image_attr_mobile;
     }
 
-    $module_smarty->assign('CATEGORIES_IMAGE_SIZE', $image_attr != '' ? $image_attr : '');
-    $module_smarty->assign('CATEGORIES_IMAGE_LIST_SIZE', $image_attr_list != '' ? $image_attr_list : '');
-    $module_smarty->assign('CATEGORIES_IMAGE_MOBILE_SIZE', $image_attr_mobile != '' ? $image_attr_mobile : '');
+    $categories_content[$rows]['CATEGORIES_IMAGE_SIZE'] = $image_attr != '' ? $image_attr : '';
+    $categories_content[$rows]['CATEGORIES_IMAGE_LIST_SIZE'] = $image_attr_list != '' ? $image_attr_list : '';
+    $categories_content[$rows]['CATEGORIES_IMAGE_MOBILE_SIZE'] = $image_attr_mobile != '' ? $image_attr_mobile : '';
 }
