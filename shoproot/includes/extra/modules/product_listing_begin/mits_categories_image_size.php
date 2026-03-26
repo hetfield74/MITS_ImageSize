@@ -13,22 +13,58 @@
  */
 
 if ((defined('MODULE_PRODUCT_MITS_IMAGESIZE_STATUS') && MODULE_PRODUCT_MITS_IMAGESIZE_STATUS == 'true')) {
-    $image_attr = $image_attr_list = $image_attr_mobile = '';
+    $cat_image_attr = ['default' => '', 'list' => '', 'mobile' => ''];
+    $needs_update = false;
+    $new_cached_data = [];
 
-    if (isset($image) && $image != '' && is_file(DIR_FS_CATALOG . $image)) {
-        list($image_width, $image_height, $image_type, $image_attr) = getimagesize(DIR_FS_CATALOG . $image);
-        $image_attr = ' ' . $image_attr;
-    }
-    if (isset($image_list) && $image_list != '' && is_file(DIR_FS_CATALOG . $image_list)) {
-        list($image_list_width, $image_list_height, $image_list_type, $image_attr_list) = getimagesize(DIR_FS_CATALOG . $image_list);
-        $image_attr_list = ' ' . $image_attr_list;
-    }
-    if (isset($image_mobile) && $image_mobile != '' && is_file(DIR_FS_CATALOG . $image_mobile)) {
-        list($width, $height, $type, $image_attr_mobile) = getimagesize(DIR_FS_CATALOG . $image_mobile);
-        $image_attr_mobile = ' ' . $image_attr_mobile;
+    $use_db_sizes = false;
+    if (defined('MODULE_CATEGORIES_MITS_PRODUCTSIMAGEFILENAMES_SAVE_SIZES')
+      && MODULE_CATEGORIES_MITS_PRODUCTSIMAGEFILENAMES_SAVE_SIZES == 'true'
+      && defined('MODULE_CATEGORIES_MITS_PRODUCTSIMAGEFILENAMES_SAVE_SIZES')
+      && MODULE_CATEGORIES_MITS_PRODUCTSIMAGEFILENAMES_SAVE_SIZES == 'true'
+    ) {
+        $use_db_sizes = true;
     }
 
-    $module_smarty->assign('CATEGORIES_IMAGE_SIZE', $image_attr != '' ? $image_attr : '');
-    $module_smarty->assign('CATEGORIES_IMAGE_LIST_SIZE', $image_attr_list != '' ? $image_attr_list : '');
-    $module_smarty->assign('CATEGORIES_IMAGE_MOBILE_SIZE', $image_attr_mobile != '' ? $image_attr_mobile : '');
+    if (!empty($categories['categories_image_sizes']) && $use_db_sizes) {
+        $cached_cat_sizes = json_decode($categories['categories_image_sizes'], true);
+        foreach ($cached_cat_sizes as $key => $dim) {
+            $cat_image_attr[$key] = ' width="' . $dim['w'] . '" height="' . $dim['h'] . '"';
+        }
+    } else {
+        if (isset($image) && $image != '' && is_file(DIR_FS_CATALOG . $image)) {
+            $size = getimagesize(DIR_FS_CATALOG . $image);
+            if ($size) {
+                $cat_image_attr['default'] = ' ' . $size[3];
+                $new_cached_data['default'] = ['w' => $size[0], 'h' => $size[1]];
+                $needs_update = true;
+            }
+        }
+        if (isset($image_list) && $image_list != '' && is_file(DIR_FS_CATALOG . $image_list)) {
+            $size = getimagesize(DIR_FS_CATALOG . $image_list);
+            if ($size) {
+                $cat_image_attr['list'] = ' ' . $size[3];
+                $new_cached_data['list'] = ['w' => $size[0], 'h' => $size[1]];
+                $needs_update = true;
+            }
+        }
+        if (isset($image_mobile) && $image_mobile != '' && is_file(DIR_FS_CATALOG . $image_mobile)) {
+            $size = getimagesize(DIR_FS_CATALOG . $image_mobile);
+            if ($size) {
+                $cat_image_attr['mobile'] = ' ' . $size[3];
+                $new_cached_data['mobile'] = ['w' => $size[0], 'h' => $size[1]];
+                $needs_update = true;
+            }
+        }
+
+        if ($needs_update && isset($categories['categories_id']) && $use_db_sizes) {
+            xtc_db_query("UPDATE " . TABLE_CATEGORIES . " 
+                          SET categories_image_sizes = '" . xtc_db_input(json_encode($new_cached_data)) . "' 
+                          WHERE categories_id = '" . (int)$categories['categories_id'] . "'");
+        }
+    }
+
+    $module_smarty->assign('CATEGORIES_IMAGE_SIZE', $cat_image_attr['default']);
+    $module_smarty->assign('CATEGORIES_IMAGE_LIST_SIZE', $cat_image_attr['list']);
+    $module_smarty->assign('CATEGORIES_IMAGE_MOBILE_SIZE', $cat_image_attr['mobile']);
 }

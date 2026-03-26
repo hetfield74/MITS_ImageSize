@@ -9,9 +9,25 @@
 
 Diese Klassenerweiterungen liest die Bildabmessungen der Artikelbilder aus und stellt sie in den Smarty-Variablen `{$PRODUCTS_IMAGE_SIZE}`, `{$module_data.PRODUCTS_IMAGE_SIZE}`, `{$module_data.PRODUCTS_IMAGE_SIZE_MIDI}` usw. zur Verfügung.
 
+
 Außerdem sind die Größen für die Kategorie-Hauptbilder `{$CATEGORIES_IMAGE_SIZE}` für `{$CATEGORIES_IMAGE}` in categorie_listing.html und product_listing_v1.html vorhanden.
 
 Die Abmessungen der Hersteller-Logos sind auf der Artikeldatailseite per `{$MANUFACTURER_IMAGE_SIZE}` erweiterbar.
+
+In Kombination mit dem Modul MITS_productsImageFilenames ab Version 1.4.0 können die Bildabmessungen aus der Datenbank kommen, was performanter ist, als per getimagesize.
+
+Außerdem kann man die Bildabmessungen im Pictureset z.B. so nutzbar machen:
+
+    {foreach name=inner item=picture_data from=$pictureset_box}
+    {assign var="img_type" value=$picture_data.IMAGE|upper}
+    {assign var="img_size" value="PRODUCTS_`$img_type`_SIZE"}
+      <source media="(max-width:{$picture_data.SIZE}px)"
+              srcset="{$module_data.PRODUCTS_IMAGE|replace:"thumbnail_images":"`$picture_data.IMAGE`"}"
+              {$module_data.$img_size}
+      >
+    {/foreach}
+    <source srcset="{$module_data.PRODUCTS_IMAGE}"{$module_data.PRODUCTS_IMAGE_SIZE}>
+    <img src="{$module_data.PRODUCTS_IMAGE}" alt="{$module_data.PRODUCTS_NAME|onlytext}"{$module_data.PRODUCTS_IMAGE_SIZE}>
 
 <hr />
 

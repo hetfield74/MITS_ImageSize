@@ -177,48 +177,83 @@ class MITS_ImageSize
     {
         global $product, $PHP_SELF;
 
-        $filename = $array['products_image'];
-        $types = ['mini', 'thumbnail', 'midi', 'info', 'popup'];
-        $image_data = [];
+        if (!empty($array['products_image_sizes'])) {
+            $image_data = [];
+            $cached_sizes = json_decode($array['products_image_sizes'], true);
 
-        foreach ($types as $type) {
-            $constant_name = 'DIR_WS_' . strtoupper($type) . '_IMAGES';
-            $path = defined($constant_name) ? constant($constant_name) : 'images/product_images/' . $type . '_images/';
+            foreach ($cached_sizes as $type => $dim) {
+                $image_data[$type] = [
+                  'width'  => $dim['w'],
+                  'height' => $dim['h'],
+                  'attr'   => ' width="' . $dim['w'] . '" height="' . $dim['h'] . '"'
+                ];
 
-            $current_name = $filename;
+                $key_name = 'PRODUCTS_' . strtoupper($type) . '_IMAGES_SIZE';
+                $productData[$key_name] = $image_data[$type]['attr'];
+            }
 
-            if (defined('IMAGE_TYPE_EXTENSION') && IMAGE_TYPE_EXTENSION != 'default') {
-                $name_extension = substr($filename, 0, strrpos($filename, '.')) . '.' . IMAGE_TYPE_EXTENSION;
-                if (is_file(DIR_FS_CATALOG . $path . $name_extension)) {
-                    $current_name = $name_extension;
+            $productData['PRODUCT_IMAGE_DETAILS'] = $image_data;
+
+            // Einzel-Zuweisungen wie im Original
+            if (isset($image_data[$image])) {
+                $productData['PRODUCTS_IMAGE_SIZE'] = $image_data[$image]['attr'];
+            }
+            if (isset($image_data['midi'])) {
+                $productData['PRODUCTS_IMAGE_SIZE_MIDI'] = $image_data['midi']['attr'];
+            }
+
+            return $productData;
+        } else {
+            static $image_cache = [];
+
+            $filename = $array['products_image'];
+            $types = ['mini', 'thumbnail', 'midi', 'info', 'popup'];
+            $image_data = [];
+
+            foreach ($types as $type) {
+                $constant_name = 'DIR_WS_' . strtoupper($type) . '_IMAGES';
+                $path = defined($constant_name) ? constant($constant_name) : 'images/product_images/' . $type . '_images/';
+
+                $current_name = $filename;
+
+                if (defined('IMAGE_TYPE_EXTENSION') && IMAGE_TYPE_EXTENSION != 'default') {
+                    $name_extension = substr($filename, 0, strrpos($filename, '.')) . '.' . IMAGE_TYPE_EXTENSION;
+                    if (is_file(DIR_FS_CATALOG . $path . $name_extension)) {
+                        $current_name = $name_extension;
+                    }
+                }
+
+                $full_path = DIR_FS_CATALOG . $path . $current_name;
+                if (is_file($full_path)) {
+                    if (isset($image_cache[$full_path])) {
+                        $size = $image_cache[$full_path];
+                    } else {
+                        $size = getimagesize($full_path);
+                        $image_cache[$full_path] = $size;
+                    }
+                    if ($size) {
+                        $image_data[$type] = [
+                          'width'  => $size[0],
+                          'height' => $size[1],
+                          'attr'   => ' ' . $size[3]
+                        ];
+                        $key_name = 'PRODUCTS_' . strtoupper($type) . '_IMAGES_SIZE';
+                        $productData[$key_name] = ' width="' . $size[0] . '" height="' . $size[1] . '"';
+                    }
                 }
             }
 
-            $full_path = DIR_FS_CATALOG . $path . $current_name;
-            if (is_file($full_path)) {
-                $size = getimagesize($full_path);
-                if ($size) {
-                    $image_data[$type] = [
-                      'width'  => $size[0],
-                      'height' => $size[1],
-                      'attr'   => ' ' . $size[3]
-                    ];
-                    $key_name = 'PRODUCTS_' . strtoupper($type) . '_IMAGES_SIZE';
-                    $productData[$key_name] = ' width="' . $size[0] . '" height="' . $size[1] . '"';
-                }
+            $productData['PRODUCT_IMAGE_DETAILS'] = $image_data;
+
+            if (isset($image_data[$image])) {
+                $productData['PRODUCTS_IMAGE_SIZE'] = $image_data[$image]['attr'];
             }
-        }
+            if (isset($image_data['midi'])) {
+                $productData['PRODUCTS_IMAGE_SIZE_MIDI'] = $image_data['midi']['attr'];
+            }
 
-        $productData['PRODUCT_IMAGE_DETAILS'] = $image_data;
-
-        if (isset($image_data[$image])) {
-            $productData['PRODUCTS_IMAGE_SIZE'] = $image_data[$image]['attr'];
+            return $productData;
         }
-        if (isset($image_data['midi'])) {
-            $productData['PRODUCTS_IMAGE_SIZE_MIDI'] = $image_data['midi']['attr'];
-        }
-
-        return $productData;
     }
 
 }
