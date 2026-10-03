@@ -45,7 +45,7 @@ class MITS_ImageSize
     {
         $this->code = 'MITS_ImageSize';
         $this->name = 'MODULE_PRODUCT_' . strtoupper($this->code);
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->sort_order = defined($this->name . '_SORT_ORDER') ? constant($this->name . '_SORT_ORDER') : 0;
         $this->enabled = defined($this->name . '_STATUS') && (constant($this->name . '_STATUS') == 'true');
 
@@ -66,6 +66,13 @@ class MITS_ImageSize
             $this->description .= '<div style="text-align:center;margin:30px 0"><a class="button but_red" style="text-align:center;" onclick="return confirmLink(\'' . constant($this->name . '_CONFIRM_DELETE_MODUL') . '\', \'\' ,this);" href="' . xtc_href_link(FILENAME_MODULES, 'set=product&module=' . $this->code . '&action=custom') . '">' . constant(
                 $this->name . '_DELETE_MODUL'
               ) . '</a></div><br>';
+        }
+
+        $mitsUpdateClientFile = DIR_FS_CATALOG . 'includes/external/mits_module_update_client/MitsModuleUpdateClient.php';
+
+        if (is_file($mitsUpdateClientFile)) {
+            require_once $mitsUpdateClientFile;
+            MitsModuleUpdateClient::integrate($this);
         }
     }
 
