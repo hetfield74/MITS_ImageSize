@@ -45,7 +45,7 @@ class MITS_ImageSize
     {
         $this->code = 'MITS_ImageSize';
         $this->name = 'MODULE_PRODUCT_' . strtoupper($this->code);
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->sort_order = defined($this->name . '_SORT_ORDER') ? constant($this->name . '_SORT_ORDER') : 0;
         $this->enabled = defined($this->name . '_STATUS') && (constant($this->name . '_STATUS') == 'true');
 
