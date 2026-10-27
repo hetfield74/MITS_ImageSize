@@ -68,11 +68,13 @@ class MITS_ImageSize
               ) . '</a></div><br>';
         }
 
-        $mitsUpdateClientFile = DIR_FS_CATALOG . 'includes/external/mits_module_update_client/MitsModuleUpdateClient.php';
+        if (defined('RUN_MODE_ADMIN')) {
+            $mitsUpdateClientFile = DIR_FS_CATALOG . 'includes/external/mits_module_update_client/MitsModuleUpdateClient.php';
 
-        if (is_file($mitsUpdateClientFile)) {
-            require_once $mitsUpdateClientFile;
-            MitsModuleUpdateClient::integrate($this);
+            if (is_file($mitsUpdateClientFile)) {
+                require_once $mitsUpdateClientFile;
+                MitsModuleUpdateClient::integrate($this);
+            }
         }
     }
 
